@@ -18,6 +18,7 @@ WORKDIR /app
 COPY --from=builder /app/chronotrace /app/chronotrace
 COPY --from=builder /app/frontend /app/frontend
 COPY --from=builder /app/data /app/data
+RUN mkdir -p /app/reports
 
 EXPOSE 8080
 

@@ -5,7 +5,7 @@ ifeq ($(OS),Windows_NT)
 	TARGET = chronotrace.exe
 	TEST_TARGET = test_all.exe
 else
-	CFLAGS = -std=c99 -Wall -Wextra -O2 -Iinclude -Iengine -Iingest -Iservice -Ithird_party
+	CFLAGS = -std=gnu99 -Wall -Wextra -O2 -D_GNU_SOURCE -Dalloca=__builtin_alloca -DMG_ARCH=1 -Iinclude -Iengine -Iingest -Iservice -Ithird_party
 	LDFLAGS = -lpthread -lm
 	TARGET = chronotrace
 	TEST_TARGET = test_all

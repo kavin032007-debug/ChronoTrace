@@ -992,22 +992,22 @@ cJSON* ct_api_handle_create_report(ct_dataset_t *ds, const char *body) {
 
     ct_report_request_t req;
     memset(&req, 0, sizeof(req));
-    strncpy(req.report_id, report_id, sizeof(req.report_id) - 1);
+    snprintf(req.report_id, sizeof(req.report_id), "%s", report_id);
 
     if (body && body[0] == '{') {
         cJSON *json = cJSON_Parse(body);
         if (json) {
             cJSON *title = cJSON_GetObjectItem(json, "title");
             if (title && title->valuestring && title->valuestring[0]) {
-                strncpy(title_str, title->valuestring, sizeof(title_str) - 1);
+                snprintf(title_str, sizeof(title_str), "%s", title->valuestring);
             }
             cJSON *p_from = cJSON_GetObjectItem(json, "path_from");
             if (p_from && p_from->valuestring) {
-                strncpy(req.path_from, p_from->valuestring, sizeof(req.path_from) - 1);
+                snprintf(req.path_from, sizeof(req.path_from), "%s", p_from->valuestring);
             }
             cJSON *p_to = cJSON_GetObjectItem(json, "path_to");
             if (p_to && p_to->valuestring) {
-                strncpy(req.path_to, p_to->valuestring, sizeof(req.path_to) - 1);
+                snprintf(req.path_to, sizeof(req.path_to), "%s", p_to->valuestring);
             }
             cJSON *ev_arr = cJSON_GetObjectItem(json, "event_ids");
             if (ev_arr && cJSON_IsArray(ev_arr)) {
@@ -1016,7 +1016,7 @@ cJSON* ct_api_handle_create_report(ct_dataset_t *ds, const char *body) {
             cJSON_Delete(json);
         }
     }
-    strncpy(req.title, title_str, sizeof(req.title) - 1);
+    snprintf(req.title, sizeof(req.title), "%s", title_str);
 
     time_t now = time(NULL);
     char time_str[64];
