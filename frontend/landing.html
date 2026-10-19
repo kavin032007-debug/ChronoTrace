@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ChronoTrace — follow the evidence</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2a12d6;--paper:#fff;--soft:#f6f3ff;--txt:#1d1260;--pk:#f4a6f0;--yl:#fdf46b;--cy:#8ff3f0;--g1:#c9b6ff;--g2:#f3b6f5;--g3:#fffab0;--g4:#b8fbfb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--ink:#a99bff;--paper:#1b1546;--soft:#261d5e;--txt:#ece8ff;--g1:#2a1b78;--g2:#4a1f6e;--g3:#3b2f66;--g4:#143e5c}}
+:root[data-theme=dark]{--ink:#a99bff;--paper:#1b1546;--soft:#261d5e;--txt:#ece8ff;--g1:#2a1b78;--g2:#4a1f6e;--g3:#3b2f66;--g4:#143e5c}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font:16px/1.6 'IBM Plex Sans',sans-serif;color:var(--txt);background:linear-gradient(180deg,var(--g1),var(--g2) 35%,var(--g3) 70%,var(--g4));background-attachment:fixed;padding:20px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;color:var(--ink);line-height:1.1}
+h1{font-size:clamp(42px,8vw,84px);font-weight:700}h2{font-size:clamp(28px,4vw,40px);font-style:italic}h3{font-size:19px}
+.win{max-width:1120px;margin:auto;background:var(--paper);border:2px solid var(--ink);border-radius:10px;box-shadow:7px 7px 0 var(--ink);overflow:hidden}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
+.dots i{display:inline-block;width:9px;height:9px;border:1.5px solid var(--ink);border-radius:50%;margin-right:4px}
+.url{flex:1;text-align:center;font-size:12px;color:var(--ink);min-width:100px}
+.pill{display:inline-block;font:600 14px 'IBM Plex Sans';color:#1d1260;text-decoration:none;border:2px solid var(--ink);border-radius:99px;padding:4px 16px;background:var(--pk);cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:.1s}
+.pill:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}.pill.y{background:var(--yl)}.pill.c{background:var(--cy)}
+.pill.big{font-size:17px;padding:9px 26px}
+section{padding:44px 32px;border-bottom:2px dashed var(--ink)}section:last-child{border:0}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+@media(max-width:800px){.hero{grid-template-columns:1fr}section{padding:34px 20px}}
+.hero p.sub{font-size:18px;max-width:520px;margin:14px 0}
+.bubble{border:2px solid var(--ink);border-radius:14px;padding:10px 16px;margin:18px 0;background:var(--paper);box-shadow:3px 3px 0 var(--ink);max-width:460px;position:relative}
+.bubble:after{content:"";position:absolute;left:30px;bottom:-12px;width:20px;height:20px;background:var(--paper);border:2px solid var(--ink);border-top:0;border-left:0;transform:rotate(45deg)}
+.tag{display:inline-block;background:var(--yl);color:#1d1260;border:2px solid var(--ink);border-radius:99px;padding:0 10px;font:600 11px 'IBM Plex Sans';margin-right:6px}
+.ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+/* desk stack of evidence cards */
+.desk{position:relative;height:340px}
+.ev{position:absolute;left:8%;width:80%;border:2px solid var(--ink);border-radius:12px;padding:12px 16px;box-shadow:5px 5px 0 var(--ink);color:#1d1260;font-size:14px}
+.ev b{font:700 17px Fraunces,serif;display:block}
+.e1{top:0;background:var(--cy);transform:rotate(-4deg)}.e2{top:84px;background:var(--yl);transform:rotate(3deg);left:14%}
+.e3{top:170px;background:var(--pk);transform:rotate(-2deg)}.e4{top:250px;background:var(--paper);color:var(--txt);transform:rotate(4deg);left:16%}
+.sticker{position:absolute;right:0;top:-6px;width:84px;height:84px;border-radius:50%;background:var(--yl);border:2px solid var(--ink);display:grid;place-items:center;font-size:36px;box-shadow:3px 3px 0 var(--ink);transform:rotate(12deg);z-index:2}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:26px}
+.card{background:var(--soft);border:2px solid var(--ink);border-radius:14px;padding:18px;box-shadow:5px 5px 0 var(--ink)}
+.card p{margin:6px 0 0;font-size:14.5px}
+.ic{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-size:21px;background:var(--pk);margin-bottom:10px}
+.card:nth-child(3n+2) .ic{background:var(--yl)}.card:nth-child(3n) .ic{background:var(--cy)}
+.steps{counter-reset:s;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:26px}
+.step{position:relative;padding-top:12px}
+.step:before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--cy);color:#1d1260;border:2px solid var(--ink);font:700 20px Fraunces,serif;box-shadow:2px 2px 0 var(--ink);margin-bottom:10px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.stats span{border:2px solid var(--ink);border-radius:99px;padding:3px 16px;font-weight:600;color:var(--ink);background:var(--soft)}
+.cta{text-align:center}.cta h2{margin-bottom:12px}
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 24px;font-size:12px;color:var(--ink);border-top:2px solid var(--ink)}
+button.pill{font-family:inherit}
+</style></head><body>
+<div class="win">
+<div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">chronotrace.local</span>
+<a class="pill" href="#features">Features</a><a class="pill y" href="#how">How it works</a><a class="pill c" href="/">Open workspace</a>
+<button class="pill" id="th" style="background:var(--paper)">Theme</button></div>
+
+<section class="hero">
+<div>
+<h1>ChronoTrace.</h1>
+<p class="sub">A forensic investigation workspace that turns raw CSV evidence into a timeline, a graph and a report you can defend, one record at a time.</p>
+<div class="bubble"><span class="tag">NEW CASE</span>Drop in three CSVs and start following the trail.</div>
+<div class="ctas"><a class="pill big" href="/">Launch workspace</a><a class="pill big y" href="#features">See what it does</a></div>
+</div>
+<div class="desk" aria-hidden="true"><div class="sticker">🕵️</div>
+<div class="ev e1"><b>09:00:05 · login</b>U01 → Laptop-7</div>
+<div class="ev e2"><b>09:02:10 · privilege_escalation</b>Severity L3, flagged</div>
+<div class="ev e3"><b>09:03:40 · network_transfer</b>Vault-Srv → external</div>
+<div class="ev e4"><b>Burst detected</b>3 events in 4 minutes</div></div>
+</section>
+
+<section id="features">
+<h2>Everything on one desk.</h2>
+<p>Eight views, one shared investigation state. Click an entity anywhere and it carries over to the graph.</p>
+<div class="grid">
+<div class="card"><div class="ic">📊</div><h3>Overview</h3><p>Totals, time span and every critical Level-3 event at a glance.</p></div>
+<div class="card"><div class="ic">⏱️</div><h3>Timeline</h3><p>Filter by type, entity, time range or severity. Ordered to the microsecond.</p></div>
+<div class="card"><div class="ic">🕸️</div><h3>Evidence graph</h3><p>Explore users, devices and files with BFS or DFS up to five hops.</p></div>
+<div class="card"><div class="ic">🧭</div><h3>Path tracer</h3><p>Find the fewest steps or the smallest time gap between two entities.</p></div>
+<div class="card"><div class="ic">🧩</div><h3>Clusters</h3><p>See isolated groups and the critical connectors holding them together.</p></div>
+<div class="card"><div class="ic">⚡</div><h3>Burst detection</h3><p>Sliding-window analysis surfaces sudden spikes of activity.</p></div>
+<div class="card"><div class="ic">🔐</div><h3>Integrity checks</h3><p>One click compares SHA-256 hashes against the baseline taken at import.</p></div>
+<div class="card"><div class="ic">📝</div><h3>Reports</h3><p>Every statement is tagged with the record IDs that back it up. Export as text.</p></div>
+</div></section>
+
+<section id="how">
+<h2>From files to findings.</h2>
+<div class="steps">
+<div class="step"><h3>Import</h3><p>Upload <code>events.csv</code>, <code>entities.csv</code> and <code>relationships.csv</code>. Bad rows are rejected with file, line and reason.</p></div>
+<div class="step"><h3>Investigate</h3><p>Search, filter, trace and cluster. Nothing is preloaded, so what you see is only your evidence.</p></div>
+<div class="step"><h3>Report</h3><p>Select events, generate a corroborated report and verify the files were never altered.</p></div>
+</div>
+<div class="stats"><span>Zero dependencies</span><span>Vanilla JS</span><span>REST + C engine</span><span>Dark / light</span></div>
+</section>
+
+<section class="cta">
+<h2>Ready to open the case?</h2>
+<p>No install, no framework, just your evidence and a clear view of it.</p>
+<div class="ctas" style="justify-content:center"><a class="pill big" href="/">Launch ChronoTrace</a></div>
+</section>
+<footer><span>© 2026 ChronoTrace</span><span>Follow the evidence.</span></footer>
+</div>
+<script>
+document.getElementById('th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme=='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'}
+</script></body></html>

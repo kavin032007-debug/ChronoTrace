@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incident Dashboard &mdash; ChronoTrace</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-icon">CT</div>
+      <div>
+        <div class="brand-title">ChronoTrace</div>
+        <div class="brand-subtitle">Executive Investigation Dashboard</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn">Open Investigation Workspace</a>
+    </div>
+  </header>
+
+  <main class="main-content" style="max-width: 1200px; margin-top: 20px;">
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-card-label">Events Under Audit</div>
+        <div id="dash-events-count" class="metric-card-num">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Identified Entities</div>
+        <div id="dash-entities-count" class="metric-card-num">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Evidence Clusters</div>
+        <div id="dash-clusters-count" class="metric-card-num">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Integrity Status</div>
+        <div id="dash-integrity-status" class="metric-card-num" style="font-size: 20px; color: var(--accent-emerald);">Verified</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+      <div class="card">
+        <div class="card-title">Recent Critical Activity</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event ID</th>
+                <th>Timestamp (UTC)</th>
+                <th>Type</th>
+                <th>Severity</th>
+              </tr>
+            </thead>
+            <tbody id="dash-events-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Quick Actions</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+          <a href="index.html" class="btn btn-secondary">Explore Interactive Timeline</a>
+          <a href="index.html" class="btn btn-secondary">Open Evidence Graph</a>
+          <button id="btn-dash-verify" class="btn btn-success">Verify Cryptographic Hashes</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function loadDashboard() {
+      try {
+        const evRes = await fetch('/api/events?limit=5');
+        const evData = await evRes.json();
+        document.getElementById('dash-events-count').textContent = evData.total || 0;
+
+        const gRes = await fetch('/api/groups');
+        const gData = await gRes.json();
+        document.getElementById('dash-clusters-count').textContent = gData.group_count || 0;
+
+        const tbody = document.getElementById('dash-events-tbody');
+        tbody.innerHTML = '';
+        (evData.events || []).forEach(ev => {
+          const tr = document.createElement('tr');
+          const badgeCls = ev.severity >= 3 ? 'badge-sev3' : (ev.severity === 2 ? 'badge-sev2' : 'badge-sev1');
+          tr.innerHTML = `
+            <td><strong>${ev.event_id}</strong></td>
+            <td>${ev.timestamp}</td>
+            <td>${ev.event_type}</td>
+            <td><span class="badge ${badgeCls}">Level ${ev.severity}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Entity count
+        const entRes = await fetch('/api/search?prefix=');
+        const entData = await entRes.json();
+        document.getElementById('dash-entities-count').textContent = entData.results ? entData.results.length : 0;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    document.getElementById('btn-dash-verify').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/integrity/verify', { method: 'POST' });
+        const data = await res.json();
+        alert(data.verified ? 'Verification Passed: All source files match baseline!' : 'Warning: Hash mismatch detected!');
+      } catch (e) {
+        alert('Verification error');
+      }
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>

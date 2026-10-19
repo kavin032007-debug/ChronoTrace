@@ -1,0 +1,15 @@
+entity_id,entity_type,name
+U01,user,User A
+U02,user,Admin Baker
+D01,device,Computer 01
+D02,device,Server Alpha
+D03,device,Lab Workstation 09
+F01,file,Project.docx
+F02,file,SystemConfig.json
+F03,file,Credentials.bak
+N01,network,Gateway 10.0.0.1
+ISO_USER,user,Isolated Analyst
+ISO_DEV,device,Offline Laptop
+ISO_FILE,file,detached_archive.tar
+ISO_NET,network,192.168.100.1
+ISO_OTHER,unknown_type,Ghost Record

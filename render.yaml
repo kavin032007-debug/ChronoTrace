@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: chronotrace
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    port: 8080

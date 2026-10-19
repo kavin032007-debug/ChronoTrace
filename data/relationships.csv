@@ -1,0 +1,8 @@
+relationship_id,source_id,target_id,relationship
+R01,U01,D01,logged_into
+R02,D01,F01,accessed
+R03,D01,D02,connected_to
+R04,D02,F02,hosts
+R05,D02,F03,hosts
+R06,D02,N01,routed_through
+R07,U02,D03,logged_into

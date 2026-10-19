@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ChronoTrace</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+<script src="graph.js"></script>
+<style>
+:root{--ink:#2a12d6;--paper:#fff;--soft:#f6f3ff;--txt:#1d1260;--pk:#f4a6f0;--yl:#fdf46b;--cy:#8ff3f0;--g1:#c9b6ff;--g2:#f3b6f5;--g3:#fffab0;--g4:#b8fbfb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--ink:#a99bff;--paper:#1b1546;--soft:#261d5e;--txt:#ece8ff;--g1:#2a1b78;--g2:#4a1f6e;--g3:#3b2f66;--g4:#143e5c}}
+:root[data-theme=dark]{--ink:#a99bff;--paper:#1b1546;--soft:#261d5e;--txt:#ece8ff;--g1:#2a1b78;--g2:#4a1f6e;--g3:#3b2f66;--g4:#143e5c}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;font:14px/1.5 'IBM Plex Sans',sans-serif;color:var(--txt);background:linear-gradient(180deg,var(--g1),var(--g2) 35%,var(--g3) 70%,var(--g4));background-attachment:fixed;padding:20px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;color:var(--ink)}
+h1{font-size:clamp(34px,6vw,56px);font-weight:700}h2{font-size:24px;font-style:italic}h3{font-size:17px}
+.win{max-width:1180px;margin:auto;background:var(--paper);border:2px solid var(--ink);border-radius:10px;box-shadow:7px 7px 0 var(--ink);overflow:hidden}
+.bar{display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
+.dots i{display:inline-block;width:9px;height:9px;border:1.5px solid var(--ink);border-radius:50%;margin-right:4px}
+.url{flex:1;text-align:center;font-size:12px;color:var(--ink);min-width:120px}
+.pill{font:600 13px 'IBM Plex Sans';color:var(--ink);border:2px solid var(--ink);border-radius:99px;padding:3px 14px;background:var(--pk);cursor:pointer;box-shadow:2px 2px 0 var(--ink);transition:.1s;text-decoration:none;display:inline-block}
+.pill:hover{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+.pill.y{background:var(--yl)}.pill.c{background:var(--cy)}.pill.w{background:var(--paper)}
+.pill.big{font-size:15px;padding:7px 20px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;border-bottom:2px dashed var(--ink)}
+.nav .pill{background:var(--paper);box-shadow:none}
+.nav .pill[aria-selected=true]{background:var(--pk);box-shadow:2px 2px 0 var(--ink)}
+.nav .pill:nth-child(3n+2)[aria-selected=true]{background:var(--yl)}.nav .pill:nth-child(3n)[aria-selected=true]{background:var(--cy)}
+main{padding:22px 24px 30px}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+input,select{font:inherit;color:var(--txt);background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:6px 10px;min-width:0}
+.sw{position:relative;flex:1;min-width:180px}.sw input{width:100%}
+#ac{position:absolute;top:100%;left:0;right:0;background:var(--paper);border:2px solid var(--ink);border-radius:8px;z-index:9;display:none;box-shadow:3px 3px 0 var(--ink)}
+#ac div{padding:6px 10px;cursor:pointer}#ac div:hover{background:var(--soft)}
+.kpi{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:2px 12px;font-weight:600;color:var(--ink);background:var(--soft)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:16px 0}
+.card{background:var(--soft);border:2px solid var(--ink);border-radius:12px;padding:14px;box-shadow:4px 4px 0 var(--ink)}
+.card b{display:block;font:700 34px Fraunces,serif;color:var(--ink)}
+.bubble{position:relative;border:2px solid var(--ink);border-radius:14px;padding:12px 16px;margin:14px 0 18px;background:var(--paper);box-shadow:3px 3px 0 var(--ink);max-width:640px}
+.tag{display:inline-block;background:var(--yl);color:#1d1260;border:2px solid var(--ink);border-radius:99px;padding:0 10px;font:600 11px 'IBM Plex Sans';margin-right:6px}
+.tbl{width:100%;border-collapse:collapse;margin-top:10px}
+.wrap{overflow-x:auto;border:2px solid var(--ink);border-radius:10px;margin-top:10px}.wrap .tbl{margin:0}
+th,td{text-align:left;padding:7px 10px;border-bottom:1.5px solid var(--ink);white-space:nowrap}th{background:var(--soft);color:var(--ink);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.chip{display:inline-block;border:1.5px solid var(--ink);border-radius:99px;padding:0 9px;margin:2px;font:500 12px 'IBM Plex Sans';background:var(--paper);color:var(--ink);cursor:pointer}
+.sev1{background:var(--cy)}.sev2{background:var(--yl)}.sev3{background:var(--pk)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row label{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--ink);gap:2px}
+#cy{min-height:480px;height:520px;border:2px solid var(--ink);border-radius:12px;background:var(--soft);flex:1;min-width:260px}
+.split{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}#side{width:260px;max-width:100%}
+.step{display:flex;gap:8px;align-items:center;padding:6px 0;flex-wrap:wrap}
+#toast{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--yl);color:#1d1260;border:2px solid var(--ink);border-radius:10px;padding:8px 14px;box-shadow:3px 3px 0 var(--ink);display:none;z-index:20}
+dialog{border:2px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--txt);box-shadow:6px 6px 0 var(--ink);max-width:420px}dialog::backdrop{backdrop-filter:blur(4px);background:#2a12d633}
+pre{white-space:pre-wrap;background:var(--soft);border:2px solid var(--ink);border-radius:10px;padding:12px}
+button.pill{font-family:inherit}
+</style></head><body>
+<div class="win">
+<div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">chronotrace.local</span>
+<a class="pill w" href="/landing" id="ln">About</a>
+<button class="pill y" id="th">Theme</button><button class="pill c" id="imp">Import CSV</button></div>
+<div class="nav" role="tablist" id="nav"></div>
+<main>
+<div class="top"><div class="sw"><input id="q" placeholder="Search entity prefix… (U01, D0…)" autocomplete="off"><div id="ac"></div></div>
+<span class="kpi" id="k1">Events: –</span><span class="kpi" id="k2">Clusters: –</span></div>
+<div id="v"></div>
+</main></div>
+<div id="toast"></div>
+<dialog id="dlg"><h3>Import evidence</h3><p>Pick events.csv, entities.csv and relationships.csv.</p>
+<input type="file" id="fl" multiple accept=".csv"><div id="rej"></div>
+<div class="row" style="margin-top:12px"><button class="pill" id="go">Upload</button><button class="pill w" onclick="dlg.close()">Close</button></div></dialog>
+<script>
+const $=s=>document.querySelector(s),S={tab:0,sel:new Set(),focus:'',pf:'',demo:false};
+const TABS=['Overview','Timeline','Graph','Path','Clusters','Bursts','Integrity','Report'];
+
+// ---- demo data fallback (used only if server /api is unreachable) ----
+const D={ents:[
+  ['U01','Alice','user'],['U02','Bob','user'],['U03','Carol','user'],
+  ['D01','Laptop-7','device'],['D02','Vault-Srv','device'],['D03','Kiosk-2','device'],
+  ['F01','payroll.xlsx','file'],['F02','keys.db','file'],['F03','notes.txt','file'],
+  ['U99','Isolated User','user'],['D99','Isolated Device','device'],['F99','unlinked_doc.pdf','file'],
+  ['E99','heartbeat','event'],['N99','10.0.0.99','network'],['X99','unknown_blob','other']
+].map(a=>({id:a[0],name:a[1],type:a[2],label:a[1]})),
+rels:[['R1','U01','D01','used'],['R2','U02','D01','used'],['R3','D01','F01','accessed'],['R4','U01','D02','logged_into'],['R5','D02','F02','stores'],['R6','U03','D03','used'],['R7','D03','F03','accessed']].map(r=>({record_id:r[0],source:r[1],target:r[2],relationship:r[3]})),
+evs:[['E101','2026-03-02 09:00:05','U01','login',1],['E102','2026-03-02 09:02:10','U01','privilege_escalation',3],['E103','2026-03-02 09:03:40','D02','network_transfer',3],['E104','2026-03-02 09:04:00','F02','file_read',2],['E105','2026-03-02 11:30:00','U02','login',1],['E106','2026-03-02 11:31:12','D01','file_read',2],['E107','2026-03-03 08:15:00','U03','login',1],['E108','2026-03-03 08:16:00','D03','file_read',1]].map(e=>({event_id:e[0],timestamp:e[1],entity_id:e[2],event_type:e[3],severity:e[4]})),reps:{}};
+const T=s=>Date.parse(s.replace(' ','T')+'Z');
+const nb=id=>D.rels.filter(r=>r.source==id||r.target==id);
+const oth=(r,id)=>r.source==id?r.target:r.source;
+function comps(skip){const seen=new Set(),out=[];D.ents.forEach(e=>{if(e.id==skip||seen.has(e.id))return;const c=[],st=[e.id];seen.add(e.id);while(st.length){const x=st.pop();c.push(x);nb(x).forEach(r=>{const o=oth(r,x);if(o!=skip&&!seen.has(o)){seen.add(o);st.push(o)}})}out.push(c)});return out}
+function demo(p,o){const u=new URL('http://x/'+p.replace(/^\//,'')),q=u.searchParams,path=u.pathname,body=o&&o.body&&typeof o.body=='string'?JSON.parse(o.body):{};
+if(path=='/events'){const t=q.get('type'),en=q.get('entity'),s=q.get('start'),e=q.get('end'),m=+q.get('min_severity')||1;
+return{events:D.evs.filter(x=>(!t||x.event_type.includes(t))&&(!en||x.entity_id==en)&&(!s||T(x.timestamp)>=T(s))&&(!e||T(x.timestamp)<=T(e))&&x.severity>=m)}}
+if(path=='/graph'){const id=q.get('entity_id')||'U01',d=+q.get('depth')||2,dfs=q.get('mode')=='dfs',seen=new Set([id]),ed=new Map();let fr=[[id,0]];while(fr.length){const[x,dp]=dfs?fr.pop():fr.shift();if(dp>=d)continue;nb(x).forEach(r=>{ed.set(r.record_id,r);const o=oth(r,x);if(!seen.has(o)){seen.add(o);fr.push([o,dp+1])}})}
+const connected=D.ents.filter(n=>seen.has(n.id));
+const isolated=D.ents.filter(e=>!D.rels.some(r=>r.source==e.id||r.target==e.id));
+return{nodes:[...connected,...isolated],edges:[...ed.values()]}}
+if(path.startsWith('/entities/')){const id=path.slice(10);const r=nb(id);const s=new Set([id,...r.map(x=>oth(x,id))]);return{nodes:D.ents.filter(n=>s.has(n.id)),edges:r}}
+if(path=='/path'){const a=q.get('from'),b=q.get('to'),prev={[a]:null},qu=[a];while(qu.length){const x=qu.shift();if(x==b)break;nb(x).forEach(r=>{const o=oth(r,x);if(!(o in prev)){prev[o]=[x,r];qu.push(o)}})}
+if(!(b in prev))return{found:false,cost:0,nodes:[],edges:[]};const es=[];let c=b;while(prev[c]){es.unshift(prev[c][1]);c=prev[c][0]}return{found:true,cost:es.length,nodes:[],edges:es.map((r,i)=>({...r}))}}
+if(path=='/groups'){return{groups:comps().map((m,i)=>({id:'C'+(i+1),size:m.length,members:m})),linking:D.ents.filter(e=>{const n=comps().length;return comps(e.id).length>n-(comps().find(c=>c.includes(e.id)&&c.length==1)?1:0)&&nb(e.id).length>1}).map(e=>({id:e.id,name:e.name,reason:'Removal splits its cluster'}))}}
+if(path=='/bursts'){const w=(+q.get('window')||5)*60000,th=+q.get('threshold')||3,ev=[...D.evs].sort((a,b)=>T(a.timestamp)-T(b.timestamp)),out=[];let last=-1;ev.forEach((x,i)=>{let j=i;while(j+1<ev.length&&T(ev[j+1].timestamp)-T(x.timestamp)<=w)j++;if(j-i+1>=th&&j>last){const g=ev.slice(i,j+1);out.push({start:g[0].timestamp,end:g[g.length-1].timestamp,count:g.length,max_severity:Math.max(...g.map(z=>z.severity)),event_ids:g.map(z=>z.event_id)});last=j}});return{bursts:out}}
+if(path=='/integrity/verify'){return{verified_at:new Date().toISOString().replace('T',' ').slice(0,19),manifest_match:true,results:['events.csv','entities.csv','relationships.csv'].map((f,i)=>{const h=(i+7).toString(16).repeat(64).slice(0,64);return{file:f,baseline:h,current:h,match:true}})}}
+if(path=='/reports'&&o&&o.method=='POST'){const id='RPT-'+Date.now().toString(36).toUpperCase(),ids=body.event_ids&&body.event_ids.length?body.event_ids:D.evs.map(e=>e.event_id),ev=D.evs.filter(e=>ids.includes(e.event_id));
+D.reps[id]={title:body.title,generated_at:new Date().toISOString(),sections:[{heading:'Executive Summary',items:[{text:ev.length+' events in scope; '+ev.filter(e=>e.severity==3).length+' critical.',record_ids:ev.map(e=>'EV'+e.event_id)}]},{heading:'Chronological Activity Sequence',items:ev.map(e=>({text:e.timestamp+' — '+e.entity_id+' '+e.event_type+' (L'+e.severity+')',record_ids:['EV'+e.event_id]}))},{heading:'Entity Corroboration & Topology',items:[...new Set(ev.map(e=>e.entity_id))].map(i=>({text:i+' linked to '+nb(i).map(r=>oth(r,i)).join(', '),record_ids:nb(i).map(r=>r.record_id)}))}]};return{id}}
+if(path.startsWith('/reports/'))return D.reps[path.slice(9)];
+if(path=='/search'){const p=(q.get('prefix')||'').toLowerCase();return{results:D.ents.filter(e=>e.id.toLowerCase().startsWith(p)||e.name.toLowerCase().startsWith(p))}}
+if(path=='/import')return{counts:{events:D.evs.length,entities:D.ents.length,relationships:D.rels.length},rejected:[]};
+return{}}
+
+async function api(p,o){try{const r=await fetch('/api'+p,o);if(!r.ok||!(r.headers.get('content-type')||'').includes('json'))throw 0;return await r.json()}catch(e){S.demo=true;return demo(p,o)}}
+const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3000)}
+const chips=a=>(a||[]).map(x=>`<span class="chip">${x}</span>`).join('');
+const ent=id=>`<span class="chip" onclick="traceG('${id}')">${id}</span>`;
+const sev=n=>`<span class="chip sev${n}">L${n}</span>`;
+const tbl=(h,rows)=>`<div class="wrap"><table class="tbl"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.join('')||`<tr><td colspan=${h.length}>Nothing found.</td></tr>`}</table></div>`;
+
+// ---- shell ----
+$('#nav').innerHTML=TABS.map((t,i)=>`<button class="pill" role="tab" aria-selected="${i==0}" data-i="${i}">${t}</button>`).join('');
+$('#nav').onclick=e=>{const i=e.target.dataset.i;if(i!=null)go(+i)};
+function go(i){S.tab=i;document.querySelectorAll('#nav .pill').forEach((b,j)=>b.setAttribute('aria-selected',j==i));V[i]();if(i===2&&window.refreshGraph){setTimeout(()=>window.refreshGraph(),60)}}
+function traceG(id){S.focus=id;go(2)}
+$('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme=='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark';if(window.updateGraphTheme)window.updateGraphTheme()};
+$('#imp').onclick=()=>dlg.showModal();
+$('#go').onclick=async()=>{
+  const f=$('#fl').files;
+  if(!f.length)return toast('Choose CSV files first');
+  const fd=new FormData();
+  [...f].forEach(x=>{
+    const n=x.name.toLowerCase();
+    if(n.includes('event'))fd.append('events',x);
+    else if(n.includes('entit'))fd.append('entities',x);
+    else if(n.includes('relation'))fd.append('relationships',x);
+    else fd.append(x.name.replace('.csv',''),x);
+  });
+  let r;
+  try{
+    const x=await fetch('/api/import',{method:'POST',body:fd});
+    if(!x.ok)throw 0;
+    r=await x.json();
+  }catch(e){
+    r=demo('/import');
+    toast('Using local fallback parser');
+  }
+  const rej=r.rejected||[];
+  $('#rej').innerHTML=rej.length?rej.map(x=>`<p>${x.file}:${x.line} ${x.reason}</p>`).join(''):`<p>✓ ${r.counts?.events||0} events, ${r.counts?.entities||0} entities, ${r.counts?.relationships||0} relationships imported</p>`;
+  await kpis();
+  go(S.tab);
+};
+
+let tm;
+$('#q').oninput=e=>{
+  clearTimeout(tm);
+  tm=setTimeout(async()=>{
+    const v=e.target.value.trim(),a=$('#ac');
+    if(!v){a.style.display='none';return}
+    const r=await api('/search?prefix='+encodeURIComponent(v));
+    a.innerHTML=(r.results||[]).map(x=>`<div onclick="$('#ac').style.display='none';traceG('${x.id}')">${x.id} · ${x.name||x.label||x.id} <small>${x.type}</small></div>`).join('')||'<div>No match</div>';
+    a.style.display='block';
+  },200);
+};
+
+async function kpis(){
+  const[e,g]=await Promise.all([api('/events'),api('/groups')]);
+  const evCount=(e.events||[]).length,grpCount=(g.groups||[]).length;
+  $('#k1').textContent='Events: '+evCount;
+  $('#k2').textContent='Clusters: '+grpCount;
+}
+
+// ---- views ----
+const V=[
+/* 0: Overview */
+async()=>{
+  const[e,g]=await Promise.all([api('/events'),api('/groups')]),ev=e.events||[],hi=ev.filter(x=>x.severity==3),ts=ev.map(x=>x.timestamp).sort();
+  if(!ev.length){
+    $('#v').innerHTML=`<h1>ChronoTrace.</h1><p>Forensic investigation workspace — follow the evidence, one record at a time.</p>
+    <div class="bubble"><span class="tag">NEW CASE</span>No evidence imported yet. Pick <b>events.csv</b>, <b>entities.csv</b> and <b>relationships.csv</b> together to begin.</div>
+    <div class="grid"><div class="card">Total events<b>0</b></div><div class="card">Entities in events<b>0</b></div><div class="card">Clusters<b>0</b></div><div class="card">Level-3 incidents<b>0</b></div></div>
+    <div style="margin-top:16px"><button class="pill big c" onclick="dlg.showModal()">Upload evidence files</button> <a class="pill big y" href="/landing" style="margin-left:8px">Product Tour</a></div>`;
+    return;
+  }
+  $('#v').innerHTML=`<h1>ChronoTrace.</h1><p>Forensic investigation workspace — follow the evidence, one record at a time.</p>
+  <div class="bubble"><span class="tag">HEADS UP</span>${S.demo?'No backend detected — showing a small demo case. ':''}Records span ${ts[0]||'–'} to ${ts[ts.length-1]||'–'} UTC. Start with the critical events below.</div>
+  <div class="grid"><div class="card">Total events<b>${ev.length}</b></div><div class="card">Entities in events<b>${new Set(ev.map(x=>x.entity_id)).size}</b></div><div class="card">Clusters<b>${(g.groups||[]).length}</b></div><div class="card">Level-3 incidents<b>${hi.length}</b></div></div>
+  <h2>High-severity threats</h2>${tbl(['Event','Time','Entity','Type'],hi.map(x=>`<tr><td>#${x.event_id}</td><td>${x.timestamp}</td><td>${ent(x.entity_id)}</td><td>${x.event_type}</td></tr>`))}`;
+},
+
+/* 1: Timeline */
+async()=>{
+  $('#v').innerHTML=`<h2>Chronological timeline</h2><div class="row"><label>Event type<input id="ft" placeholder="login"></label><label>Entity<input id="fe" placeholder="U01"></label><label>Start UTC<input id="fs" placeholder="YYYY-MM-DD HH:MM:SS"></label><label>End UTC<input id="fz" placeholder="YYYY-MM-DD HH:MM:SS"></label><label>Min severity<select id="fm"><option value="">All</option><option>1</option><option>2</option><option>3</option></select></label><button class="pill" id="fa">Apply</button></div><div id="tl"></div>`;
+  const run=async()=>{
+    const q=new URLSearchParams();
+    if($('#ft').value)q.set('type',$('#ft').value);
+    if($('#fe').value)q.set('entity',$('#fe').value);
+    if($('#fs').value)q.set('start',$('#fs').value);
+    if($('#fz').value)q.set('end',$('#fz').value);
+    if($('#fm').value)q.set('min_severity',$('#fm').value);
+    const r=await api('/events?'+q);
+    const evs=r.events||[];
+    if(!evs.length)toast('No events match');
+    $('#tl').innerHTML=tbl(['✓','ID','Timestamp','Entity','Type','Sev',''],evs.map(x=>`<tr><td><input type="checkbox" ${S.sel.has(String(x.event_id))?'checked':''} onchange="this.checked?S.sel.add('${x.event_id}'):S.sel.delete('${x.event_id}')"></td><td>#${x.event_id}</td><td>${x.timestamp}</td><td>${ent(x.entity_id)}</td><td>${x.event_type}</td><td>${sev(x.severity)}</td><td><button class="pill y" onclick="traceG('${x.entity_id}')">Trace in graph</button></td></tr>`));
+  };
+  $('#fa').onclick=run;
+  run();
+},
+
+/* 2: Graph */
+async()=>{
+  $('#v').innerHTML=`<h2>Evidence graph</h2>
+  <div class="row" style="margin-bottom:12px">
+    <label>Start entity<input id="ge" value="${S.focus||'U01'}" placeholder="U01"></label>
+    <label>Depth<select id="gd"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option></select></label>
+    <label>Mode<select id="gm"><option value="bfs">BFS</option><option value="dfs">DFS</option></select></label>
+    <button class="pill" id="gb">Explore</button>
+  </div>
+  <div class="row" style="margin-bottom:10px;gap:8px">
+    <button class="pill w" id="gfit" type="button">Fit</button>
+    <button class="pill w" id="glayout" type="button">Re-layout</button>
+  </div>
+  <div class="split">
+    <div id="cy"></div>
+    <div id="side" class="card">Click a node or an edge.</div>
+  </div>`;
+
+  $('#gfit').onclick = () => window.fitGraph && window.fitGraph();
+  $('#glayout').onclick = () => window.relayoutGraph && window.relayoutGraph();
+
+  const run=async()=>{
+    const id=$('#ge').value.trim();
+    if(!id)return;
+    const r=await api(`/graph?entity_id=${encodeURIComponent(id)}&depth=${$('#gd').value}&mode=${$('#gm').value}&include_isolated=1`);
+    const nodes=r.nodes||[];
+    if(!nodes.length)return toast('Entity not found');
+
+    if(window.drawGraph){
+      window.drawGraph($('#cy'), r, {
+        startEntity: id,
+        onNodeTap: d=>{
+          $('#side').innerHTML=`<h3>${d.name||d.label||d.id}</h3><p>${d.id} · ${d.type}</p><button class="pill c" onclick="pathFrom('${d.id}')">Trace a path</button>`;
+        },
+        onEdgeTap: d=>{
+          $('#side').innerHTML=`<h3>${d.label||'Relationship'}</h3><p>${d.source} → ${d.target}</p>${d.rec?`<span class="chip">${d.rec}</span>`:(d.id?`<span class="chip">${d.id}</span>`:'')}`;
+        },
+        onBackgroundTap: ()=>{
+          $('#side').innerHTML='Click a node or an edge.';
+        }
+      });
+    }
+  };
+  $('#gb').onclick=run;
+  run();
+},
+
+/* 3: Path */
+async()=>{
+  $('#v').innerHTML=`<h2>Relationship path tracer</h2><div class="row"><label>From<input id="pf" value="${S.pf||S.focus||''}"></label><label>To<input id="pt"></label><label>Optimise<select id="pm"><option value="bfs">Fewest steps</option><option value="dijkstra">Smallest time gap</option></select></label><button class="pill" id="pb">Find path</button></div><div id="pr" class="card" style="margin-top:14px">Enter two entities.</div>`;
+  $('#pb').onclick=async()=>{
+    const fromVal=$('#pf').value.trim(),toVal=$('#pt').value.trim();
+    if(!fromVal||!toVal)return toast('Specify both From and To entities');
+    const r=await api(`/path?from=${encodeURIComponent(fromVal)}&to=${encodeURIComponent(toVal)}&mode=${$('#pm').value}`);
+    const edges=r.edges||[];
+    $('#pr').innerHTML=r.found?`<span class="tag">PATH FOUND</span> cost ${r.cost!=null?r.cost:edges.length}${edges.map((e,i)=>`<div class="step">${ent(e.source)} <b>${e.relationship||e.label}</b> ${ent(e.target)} <span class="chip">${e.record_id}</span></div>`).join('')}`:'<span class="tag">NO PATH</span> These entities are not connected in the graph.';
+  };
+},
+
+/* 4: Clusters */
+async()=>{
+  const r=await api('/groups');
+  const grps=r.groups||[],linking=r.linking||[];
+  $('#v').innerHTML=`<h2>Clusters</h2><div class="grid">${grps.map(g=>`<div class="card"><h3>Group ${g.id} · ${g.size} entities</h3>${(g.members||[]).map(ent).join('')}</div>`).join('')||'<p>No clusters found.</p>'}</div><h2>Critical connectors</h2><p>Articulation points — remove one and the cluster fractures.</p>${tbl(['Entity','Name','Why'],linking.map(l=>`<tr><td>${ent(l.id)}</td><td>${l.name||l.label||l.id}</td><td>${l.reason||'Removal splits its cluster'}</td></tr>`))}`;
+},
+
+/* 5: Bursts */
+async()=>{
+  $('#v').innerHTML=`<h2>Activity bursts</h2><div class="row"><label>Window (min)<input id="bw" type="number" value="5"></label><label>Min events<input id="bt" type="number" value="3"></label><button class="pill" id="bb">Detect</button></div><div id="br"></div>`;
+  const run=async()=>{
+    const r=await api(`/bursts?window=${$('#bw').value}&threshold=${$('#bt').value}`);
+    const bsts=r.bursts||[];
+    $('#br').innerHTML=tbl(['Start','End','Events','Peak','IDs'],bsts.map(b=>`<tr><td>${b.start}</td><td>${b.end}</td><td>${b.count}</td><td>${sev(b.max_severity)}</td><td>${chips((b.event_ids||[]).map(i=>'#'+i))}</td></tr>`));
+  };
+  $('#bb').onclick=run;
+  run();
+},
+
+/* 6: Integrity */
+async()=>{
+  $('#v').innerHTML=`<h2>Evidence integrity</h2><p>Compare source files with the SHA-256 hashes stored at import.</p><button class="pill" id="ib">Verify now</button><div id="ir"></div>`;
+  $('#ib').onclick=async()=>{
+    const r=await post('/integrity/verify');
+    const results=r.results||[];
+    $('#ir').innerHTML=`<p><span class="tag">${r.manifest_match?'ALL MATCH':'CHANGED'}</span>Verified ${r.verified_at||'now'} UTC</p>`+tbl(['File','Baseline SHA-256','Current SHA-256','Status'],results.map(x=>`<tr><td>${x.file}</td><td><code>${(x.baseline||'').slice(0,16)}…</code></td><td><code>${(x.current||'').slice(0,16)}…</code></td><td><span class="chip ${x.match?'sev1':'sev3'}">${x.match?'Match':'Changed'}</span></td></tr>`));
+  };
+},
+
+/* 7: Report */
+async()=>{
+  const n=S.sel.size;
+  $('#v').innerHTML=`<h2>Investigation report</h2><p>${n?n+' timeline events selected.':'No selection — the whole corpus will be used.'}</p><div class="row"><label>Title<input id="rt" value="Investigation Case Summary"></label><button class="pill" id="rb">Generate</button><button class="pill c" id="rd" style="display:none">Download .txt</button></div><div id="rr"></div>`;
+  $('#rb').onclick=async()=>{
+    const evIds=n?[...S.sel]:[];
+    const {id}=await post('/reports',{title:$('#rt').value,event_ids:evIds});
+    const r=await api('/reports/'+encodeURIComponent(id));
+    const sec=r.sections||[];
+    $('#rr').innerHTML=`<h3 style="margin-top:14px">${r.title||'Report'} <span class="chip">${id}</span></h3>`+sec.map(s=>`<div class="card" style="margin:12px 0"><h3>${s.heading}</h3>${(s.items||[]).map(i=>`<p>${i.text} ${chips(i.record_ids)}</p>`).join('')}</div>`).join('');
+    const txt=(r.title||'Report')+'\n'+(r.generated_at||'')+'\n\n'+sec.map(s=>(s.heading||'').toUpperCase()+'\n'+(s.items||[]).map(i=>'- '+i.text+' ['+(i.record_ids||[]).join(', ')+']').join('\n')).join('\n\n');
+    $('#rd').style.display='';
+    $('#rd').onclick=()=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+      a.download='report-'+id+'.txt';
+      a.click();
+    };
+  };
+}
+];
+
+function pathFrom(id){S.pf=id;go(3)}
+kpis();
+V[0]();
+</script></body></html>

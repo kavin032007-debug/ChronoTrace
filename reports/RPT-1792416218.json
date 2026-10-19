@@ -1,0 +1,22 @@
+{
+	"id":	"RPT-1792416218",
+	"report_id":	"RPT-1792416218",
+	"title":	"Investigation report",
+	"generated_at":	"2026-10-19 13:23:38 UTC",
+	"sections":	[{
+			"heading":	"Executive Summary",
+			"items":	[{
+					"text":	"Investigation dataset analyzed 10 chronological event record(s).",
+					"record_ids":	["E101", "E102", "E103", "E104", "E105", "E106", "E107", "E108", "E109", "E110"]
+				}]
+		}, {
+			"heading":	"Chronological Activity Sequence",
+			"items":	[]
+		}, {
+			"heading":	"Involved Entities & Graph Topology",
+			"items":	[{
+					"text":	"Mapped 0 entities across connected infrastructure clusters.",
+					"record_ids":	[]
+				}]
+		}]
+}

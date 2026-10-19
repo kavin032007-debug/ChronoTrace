@@ -1,0 +1,11 @@
+event_id,timestamp,entity_id,event_type,severity
+E101,2026-10-19 10:00:00,U01,login,1
+E102,2026-10-19 10:02:00,D01,process_spawn,1
+E103,2026-10-19 10:05:00,D01,network_connect,2
+E104,2026-10-19 10:08:00,F01,file_modified,2
+E105,2026-10-19 10:09:00,U01,privilege_escalation,3
+E106,2026-10-19 10:10:00,D01,auth_bypass,3
+E107,2026-10-19 10:12:00,F02,file_deleted,2
+E108,2026-10-19 10:15:00,D02,network_transfer,2
+E109,2026-10-19 10:30:00,U02,login,1
+E110,2026-10-19 10:35:00,D03,login,1

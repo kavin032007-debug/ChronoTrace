@@ -1,0 +1,55 @@
+{
+	"id":	"RPT-1792418222",
+	"report_id":	"RPT-1792418222",
+	"title":	"Investigation Case Summary",
+	"generated_at":	"2026-10-19 13:57:02 UTC",
+	"sections":	[{
+			"heading":	"Executive Summary",
+			"items":	[{
+					"text":	"Investigation dataset analyzed 0 chronological event record(s).",
+					"record_ids":	["E101", "E102", "E103", "E104", "E105", "E106", "E107", "E108", "E109", "E110"]
+				}, {
+					"text":	"Identified 2 high-severity (Level 3) security incident(s) requiring immediate attention.",
+					"record_ids":	["E105", "E106"]
+				}]
+		}, {
+			"heading":	"Chronological Activity Sequence",
+			"items":	[{
+					"text":	"2026-10-19 10:00:00 - login observed on entity U01 (Severity Level 1)",
+					"record_ids":	["E101"]
+				}, {
+					"text":	"2026-10-19 10:02:00 - process_spawn observed on entity D01 (Severity Level 1)",
+					"record_ids":	["E102"]
+				}, {
+					"text":	"2026-10-19 10:05:00 - network_connect observed on entity D01 (Severity Level 2)",
+					"record_ids":	["E103"]
+				}, {
+					"text":	"2026-10-19 10:08:00 - file_modified observed on entity F01 (Severity Level 2)",
+					"record_ids":	["E104"]
+				}, {
+					"text":	"2026-10-19 10:09:00 - privilege_escalation observed on entity U01 (Severity Level 3)",
+					"record_ids":	["E105"]
+				}, {
+					"text":	"2026-10-19 10:10:00 - auth_bypass observed on entity D01 (Severity Level 3)",
+					"record_ids":	["E106"]
+				}, {
+					"text":	"2026-10-19 10:12:00 - file_deleted observed on entity F02 (Severity Level 2)",
+					"record_ids":	["E107"]
+				}, {
+					"text":	"2026-10-19 10:15:00 - network_transfer observed on entity D02 (Severity Level 2)",
+					"record_ids":	["E108"]
+				}, {
+					"text":	"2026-10-19 10:30:00 - login observed on entity U02 (Severity Level 1)",
+					"record_ids":	["E109"]
+				}, {
+					"text":	"2026-10-19 10:35:00 - login observed on entity D03 (Severity Level 1)",
+					"record_ids":	["E110"]
+				}]
+		}, {
+			"heading":	"Involved Entities & Graph Topology",
+			"items":	[{
+					"text":	"Mapped 9 entities across connected infrastructure clusters.",
+					"record_ids":	["E101", "E101", "E102", "E102", "E103", "E103", "E104", "E104", "E105", "E105", "E106", "E106", "E107", "E107", "E108", "E108", "E109", "E109", "E110", "E110", "R01"]
+				}]
+		}]
+}
