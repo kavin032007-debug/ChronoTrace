@@ -2,6 +2,8 @@
 
 **Explainable Digital Incident Reconstruction & Evidence Correlation Platform**
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kavin032007-debug/ChronoTrace)
+
 ChronoTrace is an investigation platform that correlates fragmented event logs across users, devices, files, and networks. It reconstructs incident timelines, uncovers relationships, detects bursts of anomalous activity, identifies critical connecting points between isolated evidence groups, and validates evidence integrity through cryptographic manifest verification.
 
 ---
