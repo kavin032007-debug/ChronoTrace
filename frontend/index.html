@@ -53,6 +53,7 @@ button.pill{font-family:inherit}
 </style></head><body>
 <div class="win">
 <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">chronotrace.local</span>
+<button class="pill w" id="srv" title="Set Backend API URL">API: Direct</button>
 <a class="pill w" href="/landing" id="ln">About</a>
 <button class="pill y" id="th">Theme</button><button class="pill c" id="imp">Import CSV</button></div>
 <div class="nav" role="tablist" id="nav"></div>
@@ -103,7 +104,26 @@ if(path=='/search'){const p=(q.get('prefix')||'').toLowerCase();return{results:D
 if(path=='/import')return{counts:{events:D.evs.length,entities:D.ents.length,relationships:D.rels.length},rejected:[]};
 return{}}
 
-async function api(p,o){try{const r=await fetch('/api'+p,o);if(!r.ok||!(r.headers.get('content-type')||'').includes('json'))throw 0;return await r.json()}catch(e){S.demo=true;return demo(p,o)}}
+const getBase=()=>(localStorage.getItem('ct_backend_url')||'').replace(/\/$/,'');
+function updateSrvBtn(){
+  const b=getBase(),el=$('#srv');
+  if(!el)return;
+  if(b){try{el.textContent='API: '+new URL(b).hostname}catch(e){el.textContent='API: Custom'}}
+  else{el.textContent='API: Direct'}
+}
+updateSrvBtn();
+$('#srv').onclick=()=>{
+  const cur=localStorage.getItem('ct_backend_url')||'';
+  const val=prompt('Enter Backend API URL (e.g. https://your-backend.onrender.com) or leave empty for same-host /api:', cur);
+  if(val!==null){
+    if(val.trim())localStorage.setItem('ct_backend_url',val.trim());
+    else localStorage.removeItem('ct_backend_url');
+    updateSrvBtn();
+    location.reload();
+  }
+};
+
+async function api(p,o){try{const r=await fetch(getBase()+'/api'+p,o);if(!r.ok||!(r.headers.get('content-type')||'').includes('json'))throw 0;return await r.json()}catch(e){S.demo=true;return demo(p,o)}}
 const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3000)}
 const chips=a=>(a||[]).map(x=>`<span class="chip">${x}</span>`).join('');
@@ -131,7 +151,7 @@ $('#go').onclick=async()=>{
   });
   let r;
   try{
-    const x=await fetch('/api/import',{method:'POST',body:fd});
+    const x=await fetch(getBase()+'/api/import',{method:'POST',body:fd});
     if(!x.ok)throw 0;
     r=await x.json();
   }catch(e){
